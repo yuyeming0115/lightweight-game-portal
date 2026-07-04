@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>数据验证 - 游戏门户</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      padding: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 24px; margin-bottom: 5px; }
+    .subtitle { color: #888; margin-bottom: 30px; font-size: 14px; }
+    .stats { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+    .stat-card {
+      background: #16213e;
+      border-radius: 10px;
+      padding: 18px 22px;
+      flex: 1; min-width: 150px;
+    }
+    .stat-num { font-size: 28px; font-weight: 700; }
+    .stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+    .section { margin-bottom: 25px; }
+    .section h2 { font-size: 16px; margin-bottom: 12px; padding-left: 10px; border-left: 3px solid #667eea; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 8px 10px; border-bottom: 2px solid #333; color: #aaa; font-weight: 600; }
+    td { padding: 8px 10px; border-bottom: 1px solid #222; }
+    tr:hover { background: #16213e; }
+    .tag { background: #667eea33; color: #a8b3ff; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+    .tag.snokido { background: #764ba233; color: #d4a5ff; }
+    .actions { position: fixed; top: 20px; right: 20px; display: flex; gap: 8px; }
+    .btn-sm {
+      padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer;
+      font-size: 12px; font-weight: 600;
+    }
+    .btn-primary { background: #667eea; color: white; }
+    .btn-secondary { background: #333; color: #ccc; }
+  </style>
+</head>
+<body>
+  <div class="actions">
+    <button class="btn-sm btn-primary" onclick="location.href='index.html'">← 返回项目</button>
+    <button class="btn-sm btn-secondary" onclick="location.href='import-snokido.html'">导入页面</button>
+  </div>
+
+  <h1>🔍 数据验证面板</h1>
+  <p class="subtitle">查看 localStorage 中已存储的所有游戏数据</p>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="section">
+    <h2>📋 全部游戏列表（<span id="total-count">0</span>）</h2>
+    <table id="game-table">
+      <thead><tr><th>#</th><th>游戏名</th><th>类型</th><th>平台</th><th>开发者/团队</th><th>来源标签</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>📊 类型分布</h2>
+    <div id="genre-dist"></div>
+  </div>
+
+  <script>
+    const raw = localStorage.getItem('lgos-state');
+    let state;
+
+    if (!raw) {
+      document.body.innerHTML = '<h1 style="color:#f44;text-align:center;padding-top:100px;">⚠️ 未找到数据！请先导入 JSON 文件</h1>';
+    } else {
+      state = JSON.parse(raw);
+      const games = state.games || [];
+
+      // 统计
+      const snokidoCount = games.filter(g => (g.tags || []).includes('Snokido')).length;
+      const genres = {};
+      const platforms = {};
+      games.forEach(g => {
+        genres[g.genre] = (genres[g.genre] || 0) + 1;
+        platforms[g.platform] = (platforms[g.platform] || 0) + 1;
+      });
+
+      // 统计卡片
+      document.getElementById('stats').innerHTML = `
+        <div class="stat-card"><div class="stat-num">${games.length}</div><div class="stat-label">总游戏数</div></div>
+        <div class="stat-card"><div class="stat-num" style="color:#d4a5ff">${snokidoCount}</div><div class="stat-label">Snokido 来源</div></div>
+        <div class="stat-card"><div class="stat-num">${Object.keys(genres).length}</div><div class="stat-label">类型数</div></div>
+        <div class="stat-card"><div class="stat-num">${Object.keys(platforms).length}</div><div class="stat-label">平台数</div></div>
+      `;
+
+      // 表格
+      document.getElementById('total-count').textContent = games.length;
+      const tbody = document.querySelector('#game-table tbody');
+      games.forEach((g, i) => {
+        const isSnokido = (g.tags || []).includes('Snokido');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td style="font-weight:600">${g.name}</td>
+          <td>${g.genre}</td>
+          <td>${g.platform}</td>
+          <td>${g.team || '-'}</td>
+          <td>${isSnokido ? '<span class="tag snokido">Snokido</span>' : '<span class="tag">原始</span>'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // 类型分布
+      document.getElementById('genre-dist').innerHTML = Object.entries(genres)
+        .sort((a,b) => b[1]-a[1])
+        .map(([k,v]) => `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222;">
+          <span>${k}</span><span style="font-weight:600;color:#a8b3ff">${v} 款</span></div>`).join('');
+    }
+  </script>
+</body>
+</html>

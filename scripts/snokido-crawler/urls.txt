@@ -1,0 +1,35 @@
+# Snokido 游戏 URL 列表
+# 格式：每行一个完整的游戏页面 URL
+
+# 解谜类（优先）
+https://www.snokido.com/game/egg-adventure
+https://www.snokido.com/game/snail-bob-7
+https://www.snokido.com/game/block-blast
+https://www.snokido.com/game/water-sort-puzzle
+https://www.snokido.com/game/brain-test
+https://www.snokido.com/game/puzzle-fizza
+
+# 动作类
+https://www.snokido.com/game/bouncemasters
+https://www.snokido.com/game/subway-surfers
+https://www.snokido.com/game/temple-run-2
+https://www.snokido.com/game/vector-parkour
+
+# 体育类
+https://www.snokido.com/game/basketball-stars
+https://www.snokido.com/game/soccer-skills
+https://www.snokido.com/game/8-ball-billiards
+
+# 冒险类
+https://www.snokido.com/game/fireboy-and-watergirl-6
+https://www.snokido.com/game/adam-and-eve
+https://www.snokido.com/game/red-ball-5
+
+# 街机类
+https://www.snokido.com/game/flappy-bird
+https://www.snokido.com/game/2048
+https://www.snokido.com/game/pac-man
+
+# 技巧类
+https://www.snokido.com/game/hill-climb-racing
+https://www.snokido.com/game/happy-wheels

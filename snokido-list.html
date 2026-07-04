@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>🎮 Snokido 导入游戏清单</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0f172a;color:#e2e8f0;max-width:960px;margin:0 auto;padding:20px}
+h1{font-size:26px;margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.badge{background:#7c3aed;color:white;font-size:11px;padding:3px 8px;border-radius:4px;vertical-align:middle}
+.sub{color:#64748b;font-size:13px;margin-bottom:24px}
+
+/* 统计条 */
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:14px}
+.bar-label{width:90px;color:#94a3b8;flex-shrink:0}
+.bar-track{flex:1;height:22px;background:#1e293b;border-radius:11px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:11px;display:flex;align-items:center;padding-left:10px;font-size:12px;font-weight:600;color:#fff;min-width:40px}
+.bar-num{width:30px;text-align:right;font-weight:700;color:#e2e8f0}
+
+/* 卡片网格 */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:20px}
+.card{background:#1e293b;border-radius:12px;padding:16px;transition:transform .15s,box-shadow .15s;border:1px solid #334155;cursor:pointer;position:relative}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.35);border-color:#7c3aed}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.card-name{font-size:16px;font-weight:700;line-height:1.25}
+.card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:11px;padding:2px 8px;border-radius:4px}
+.tag-g{background:#7c3aed33;color:#c084fc}.tag-p{background:#05966933;color:#34d399}
+.tag-d{background:#dc262633;color:#fca5a5}.tag-s{background:#2563eb33;color:#60a5fa}
+.card-desc{font-size:12px;color:#94a3b8;margin-top:8px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-link{font-size:11px;color:#64748b;margin-top:6px;word-break:break-all}
+.card-link a{color:#7c3aed;text-decoration:none}
+.card-link a:hover{text-decoration:underline}
+
+/* 操作栏 */
+.actions{position:fixed;top:16px;right:16px;z-index:99;display:flex;gap:8px}
+.btn{padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:600}
+.btn-p{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff}
+.btn-s{background:#334155;color:#94a3b8}
+
+/* 分隔 */
+hr{border:none;border-top:1px solid #334155;margin:28px 0}
+.sec-title{font-size:18px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.hint{font-size:12px;color:#64748b;background:#1e293b;padding:12px 16px;border-radius:8px;margin-bottom:20px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="actions">
+  <button class="btn btn-s" onclick="location.href='index.html'">← 返回主项目</button>
+  <button class="btn btn-p" onclick="window.print()">🖨️ 打印</button>
+</div>
+
+<h1>🎮 Snokido 导入游戏清单 <span class="badge">12 款</span></h1>
+<p class="sub">2026-07-04 批量抓取 · 数据来源 snokido.com</p>
+
+<div class="hint">
+  💡 <b>如何使用：</b>点击下方任意游戏卡片，回到主项目后即可填写 LGOS 九维评分。
+  <br>所有游戏 <b style="color:#c084fc">lgos = 0（未评分）</b>，需要你手动评估每款游戏的 9 个维度得分。
+</div>
+
+<!-- 统计 -->
+<h2 class="sec-title">📊 类型分布</h2>
+<div id="stats"></div>
+
+<hr>
+
+<!-- 游戏列表 -->
+<h2 class="sec-title">🎯 12 款待评分游戏</h2>
+<div id="cards" class="grid"></div>
+
+<script>
+const raw = localStorage.getItem('lgos-state');
+let state;
+try { state = raw ? JSON.parse(raw) : null; } catch(e) { state = null; }
+
+if (!state || !state.games) {
+  document.body.innerHTML = '<h1 style="text-align:center;padding-top:80px;color:#f44">⚠️ 未找到数据<br><span style="font-size:14px;color:#888">请先通过 import-snokido.html 导入 JSON</span></h1>';
+} else {
+  // 筛选 Snokido 游戏
+  const allGames = state.games.filter(g => (g.tags||[]).includes('Snokido'));
+
+  if (allGames.length === 0) {
+    document.getElementById('cards').innerHTML = '<p style="color:#f44;padding:20px">未检测到 Snokido 标签的游戏。可能尚未导入。</p>';
+  } else {
+    // 类型统计
+    const genreMap = {};
+    allGames.forEach(g => { genreMap[g.genre] = (genreMap[g.genre]||0)+1; });
+    const maxCount = Math.max(...Object.values(genreMap));
+    const colors = ['#7c3aed','#059669','#dc2626','#2563eb','#d97706','#0891b2'];
+    let ci = 0;
+    document.getElementById('stats').innerHTML = Object.entries(genreMap)
+      .sort((a,b)=>b[1]-a[1])
+      .map(([k,v])=>{
+        const pct = Math.round(v/allGames.length*100);
+        return `<div class="bar-row">
+          <span class="bar-label">${k}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${v/maxCount*100}%;background:${colors[ci++%colors.length]}">${v}</div></div>
+          <span class="bar-num">${pct}%</span>
+        </div>`;
+      }).join('');
+
+    // 卡片
+    const container = document.getElementById('cards');
+    allGames.forEach(g => {
+      const dev = g.team || '未知';
+      const srcUrl = g.playSource?.replace('Snokido: ','') || '';
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.onclick = () => {
+        // 存储选中的游戏 ID 到 sessionStorage
+        sessionStorage.setItem('_focus_game_id', g.id);
+        location.href = 'index.html';
+      };
+      card.innerHTML = `
+        <div class="card-header">
+          <div class="card-name">${g.name}</div>
+          <span class="tag tag-g">LGOS ${g.lgos}</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-g">${g.genre}</span>
+          <span class="tag tag-p">${g.platform}</span>
+          <span class="tag tag-d">${g.sourceCredibility}</span>
+        </div>
+        <div class="card-desc">${g.reason || '暂无描述'}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+          <span class="tag tag-s">👤 ${dev}</span>
+        </div>
+        ${srcUrl ? `<div class="card-link">🔗 <a href="${srcUrl}" target="_blank" onclick="event.stopPropagation()">${srcUrl.replace('https://www.snokido.com/game/','')}</a></div>` : ''}
+      `;
+      container.appendChild(card);
+    });
+
+    document.querySelectorAll('.bar-num')[0].textContent += ` (${allGames.length})`;
+  }
+}
+</script>
+</body>
+</html>

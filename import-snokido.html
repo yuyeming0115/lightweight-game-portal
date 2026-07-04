@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>导入 Snokido 游戏数据</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 600px;
+      width: 100%;
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #1a1a2e;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .stats {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .stats-row:last-child { margin-bottom: 0; }
+
+    .stats-label { color: #666; }
+    .stats-value { font-weight: 600; color: #1a1a2e; }
+
+    .drop-zone {
+      border: 3px dashed #667eea;
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 20px;
+    }
+
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: #764ba2;
+      background: #f8f9ff;
+    }
+
+    .drop-zone-icon { font-size: 48px; margin-bottom: 10px; }
+
+    .drop-zone-text {
+      font-size: 16px;
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .drop-zone-hint {
+      font-size: 12px;
+      color: #999;
+      margin-top: 10px;
+    }
+
+    input[type="file"] { display: none; }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102,126,234,0.4); }
+
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #666;
+    }
+
+    .btn-secondary:hover { background: #e9ecef; }
+
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .status.success {
+      display: block;
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status.error {
+      display: block;
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .game-list {
+      margin-top: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .game-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .game-item:last-child { border-bottom: none; }
+
+    .game-name { font-weight: 500; }
+    .game-genre { color: #666; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎮 导入 Snokido 游戏数据</h1>
+    <p class="subtitle">将爬虫生成的 JSON 文件导入到游戏分析项目</p>
+
+    <div class="stats">
+      <div class="stats-row">
+        <span class="stats-label">预计导入游戏数：</span>
+        <span class="stats-value" id="game-count">-</span>
+      </div>
+      <div class="stats-row">
+        <span class="stats-label">JSON 文件大小：</span>
+        <span class="stats-value" id="file-size">-</span>
+      </div>
+    </div>
+
+    <div class="drop-zone" id="drop-zone">
+      <div class="drop-zone-icon">📂</div>
+      <div class="drop-zone-text">点击或拖拽 JSON 文件到这里</div>
+      <div class="drop-zone-hint">支持 snokido-games-*.json 格式</div>
+    </div>
+    <input type="file" id="file-input" accept=".json">
+
+    <button class="btn btn-primary" id="import-btn" disabled>导入并打开项目</button>
+    <button class="btn btn-secondary" onclick="location.href='index.html'">返回项目</button>
+
+    <div class="status" id="status"></div>
+
+    <div class="game-list" id="game-list" style="display: none;"></div>
+  </div>
+
+  <script>
+    let importedData = null;
+    let fileName = '';
+
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const importBtn = document.getElementById('import-btn');
+    const status = document.getElementById('status');
+    const gameList = document.getElementById('game-list');
+
+    // 点击拖拽区选择文件
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // 文件选择
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+      }
+    });
+
+    // 拖拽事件
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drag-over');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('drag-over');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length > 0) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    // 处理文件
+    function handleFile(file) {
+      if (!file.name.endsWith('.json')) {
+        showStatus('error', '❌ 请选择 JSON 文件');
+        return;
+      }
+
+      fileName = file.name;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          importedData = JSON.parse(reader.result);
+          if (!importedData.games || !Array.isArray(importedData.games)) {
+            showStatus('error', '❌ JSON 格式不正确：缺少 games 数组');
+            return;
+          }
+
+          // 显示统计
+          document.getElementById('game-count').textContent = `${importedData.games.length} 款`;
+          document.getElementById('file-size').textContent = formatFileSize(file.size);
+
+          // 显示游戏列表
+          displayGameList(importedData.games);
+
+          // 启用导入按钮
+          importBtn.disabled = false;
+          importBtn.textContent = `导入 ${importedData.games.length} 款游戏并打开项目`;
+
+          showStatus('success', `✅ 已读取 ${importedData.games.length} 款游戏数据`);
+
+        } catch (error) {
+          showStatus('error', '❌ JSON 解析失败：' + error.message);
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+    }
+
+    // 显示游戏列表
+    function displayGameList(games) {
+      gameList.style.display = 'block';
+      gameList.innerHTML = '<h3 style="margin-bottom:10px;font-size:14px;color:#666;">游戏列表：</h3>';
+
+      games.forEach(game => {
+        const item = document.createElement('div');
+        item.className = 'game-item';
+        item.innerHTML = `
+          <span class="game-name">${game.name}</span>
+          <span class="game-genre">${game.genre} | ${game.team || '未知开发者'}</span>
+        `;
+        gameList.appendChild(item);
+      });
+    }
+
+    // 导入按钮点击
+    importBtn.addEventListener('click', () => {
+      if (!importedData) return;
+
+      try {
+        // 读取现有数据
+        const existingData = localStorage.getItem('lgos-state');
+        let state = existingData ? JSON.parse(existingData) : { games: [], analyses: [] };
+
+        // 合并游戏（避免重复）
+        const existingIds = new Set(state.games.map(g => g.id));
+        const existingNames = new Set(state.games.map(g => g.name.toLowerCase()));
+
+        let addedCount = 0;
+        let skippedCount = 0;
+
+        importedData.games.forEach(game => {
+          if (existingIds.has(game.id) || existingNames.has(game.name.toLowerCase())) {
+            skippedCount++;
+          } else {
+            state.games.push(game);
+            addedCount++;
+          }
+        });
+
+        // 保存回 localStorage
+        localStorage.setItem('lgos-state', JSON.stringify(state));
+
+        showStatus('success', `✅ 导入完成！新增 ${addedCount} 款游戏，跳过 ${skippedCount} 款重复游戏`);
+
+        // 延迟后打开主项目
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1500);
+
+      } catch (error) {
+        showStatus('error', '❌ 导入失败：' + error.message);
+      }
+    });
+
+    // 显示状态
+    function showStatus(type, message) {
+      status.className = `status ${type}`;
+      status.textContent = message;
+      status.style.display = 'block';
+    }
+
+    // 格式化文件大小
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+  </script>
+</body>
+</html>

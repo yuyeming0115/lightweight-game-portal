@@ -14,3 +14,13 @@ Desktop.ini
 # Temp
 *.tmp
 *~
+
+# WorkBuddy (local AI memory, platform-specific paths)
+.workbuddy/
+
+# Node dependencies
+node_modules/
+
+# Generated output (crawler JSON exports)
+snokido-*.json
+scripts/snokido-crawler/snokido-*.json
