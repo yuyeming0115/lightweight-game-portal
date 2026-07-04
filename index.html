@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 世代轻量游戏门户 MVP</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#radar" aria-label="回到机会雷达">
+          <span class="brand-mark">LG</span>
+          <span>
+            <strong>AI 世代轻量游戏门户</strong>
+            <small>机会雷达 / 游戏库 / 玩法拆解 / 模块库 / MVP 组合器</small>
+          </span>
+        </a>
+        <nav class="top-nav" aria-label="主导航">
+          <a href="#radar">雷达</a>
+          <a href="#insights">洞察</a>
+          <a href="#library">游戏库</a>
+          <a href="#samples">样本池</a>
+          <a href="#analysis">拆解</a>
+          <a href="#modules">模块</a>
+          <a href="#composer">组合器</a>
+          <a href="#templates">模板</a>
+        </nav>
+        <div class="top-actions">
+          <span class="version-note" data-version-note>数据版本检查中</span>
+          <button class="ghost-btn" type="button" data-action="export-json">导出</button>
+          <button class="ghost-btn" type="button" data-action="export-workbook-md">导出研究汇总</button>
+          <button class="ghost-btn" type="button" data-action="export-progress-report">导出进度报告</button>
+          <label class="file-btn">
+            导入
+            <input type="file" accept="application/json" data-import-file />
+          </label>
+          <button class="danger-btn" type="button" data-action="reset-data">重置</button>
+        </div>
+      </header>
+
+      <section id="radar" class="hero-grid">
+        <aside class="side-panel">
+          <p class="eyebrow">MVP 目标</p>
+          <h1>先做一个每天愿意打开的研究工作台</h1>
+          <p class="lead">第一版聚焦手动收录、结构化拆解、模块沉淀和原型拼装。先验证内容生产效率，再考虑复杂后台和自动化采集。</p>
+          <div class="metric-stack" data-stats></div>
+        </aside>
+
+        <section class="radar-panel">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Opportunity Radar</p>
+              <h2>本周机会雷达</h2>
+            </div>
+            <span class="status-pill">第 0 阶段：研究库验证</span>
+          </div>
+          <div class="radar-layout">
+            <article class="focus-card" data-focus-card></article>
+            <div class="radar-column" data-radar-column></div>
+          </div>
+        </section>
+      </section>
+
+      <section id="insights" class="content-band">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Research Insights</p>
+            <h2>统计与优先级</h2>
+          </div>
+          <span class="status-pill">自动汇总平台、LGOS、资料完整度、模块复用和样本优先级</span>
+        </div>
+        <div class="insight-grid" data-research-insights></div>
+      </section>
+
+      <section id="library" class="content-band">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Game Library</p>
+            <h2>游戏库</h2>
+          </div>
+          <div class="toolbar">
+            <input type="search" placeholder="搜索游戏、类型、标签" data-game-search />
+            <select data-platform-filter aria-label="平台筛选"></select>
+          </div>
+        </div>
+
+        <div class="two-column">
+          <form class="form-panel" data-game-form>
+            <h3>快速收录</h3>
+            <div class="form-grid">
+              <label><span>游戏名</span><input name="name" required placeholder="例如：合成猫塔" /></label>
+              <label><span>平台</span><select name="platform" required></select></label>
+              <label><span>类型</span><input name="genre" required placeholder="合成 / 放置" /></label>
+              <label><span>地区</span><input name="region" placeholder="中国 / 欧美 / 日本" /></label>
+              <label><span>团队规模</span><select name="team"><option>单人</option><option>小团队</option><option>中型团队</option><option>不明</option></select></label>
+              <label><span>微信适配</span><select name="wechatFit"><option>是</option><option>可改造</option><option>否</option></select></label>
+              <label><span>商业化</span><input name="monetization" placeholder="激励视频 / 内购" /></label>
+              <label><span>可玩来源</span><input name="playSource" placeholder="链接 / 小程序名 / Steam 页面" /></label>
+              <label><span>热度来源</span><input name="heatSource" placeholder="榜单 / 视频 / 评论 / 媒体" /></label>
+              <label><span>来源可信度</span><select name="sourceCredibility"><option>A</option><option>B</option><option selected>C</option><option>D</option></select></label>
+              <label class="wide"><span>截图观察</span><textarea name="screenshotNotes" rows="2" placeholder="画面第一印象、UI 密度、题材包装"></textarea></label>
+              <label class="wide"><span>视频 / 评论笔记</span><textarea name="videoNotes" rows="2" placeholder="短视频开头、评论高频词、失败刺激点"></textarea></label>
+              <fieldset class="score-fieldset wide">
+                <legend>LGOS 九维评分</legend>
+                <div class="score-input-grid" data-lgos-inputs></div>
+              </fieldset>
+              <label class="wide"><span>一句话判断</span><textarea name="reason" rows="3" placeholder="为什么值得研究"></textarea></label>
+            </div>
+            <button class="primary-btn" type="submit">加入游戏库</button>
+          </form>
+          <div class="library-grid" data-game-grid></div>
+        </div>
+      </section>
+
+      <section id="samples" class="content-band">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">First Batch</p>
+            <h2>第一批 20 款样本池</h2>
+          </div>
+          <div class="toolbar">
+            <select data-sample-priority aria-label="样本优先级筛选"></select>
+            <select data-sample-status aria-label="样本状态筛选"></select>
+          </div>
+        </div>
+        <form class="bulk-panel" data-sample-bulk-form>
+          <div>
+            <h3>批量导入样本</h3>
+            <p>每行一条：游戏名 | 平台 | 类型 | 优先级 | 备注。优先级可填 P0-P3，缺省按 P2 处理。</p>
+          </div>
+          <textarea data-sample-bulk-input rows="4" placeholder="修仙大作战 | 微信小游戏 | 修仙 / 放置 | P0 | 研究长线成长和付费礼包&#10;整理冰箱 | 抖音小游戏 | 收纳 | P2 | 3 秒看懂"></textarea>
+          <div class="toolbar">
+            <button class="primary-btn" type="submit">导入到样本池</button>
+            <button class="ghost-btn" type="button" data-action="sample-bulk-demo">填入示例</button>
+          </div>
+        </form>
+        <div class="sample-board" data-sample-board></div>
+      </section>
+
+      <section id="analysis" class="content-band">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Analysis System</p>
+            <h2>玩法拆解台</h2>
+          </div>
+          <span class="status-pill">固定拆核心循环、前 30 秒、前 3 分钟、回流、模块和风险</span>
+        </div>
+
+        <div class="analysis-workspace">
+          <aside class="analysis-list" data-analysis-list></aside>
+          <article class="analysis-detail" data-analysis-detail></article>
+          <form class="form-panel analysis-form" data-analysis-form>
+            <h3>新增拆解</h3>
+            <label><span>关联游戏</span><select name="gameId" required></select></label>
+            <label><span>一句话概念</span><textarea name="concept" rows="3" required></textarea></label>
+            <label><span>第一眼印象</span><textarea name="firstImpression" rows="2"></textarea></label>
+            <label><span>3 秒吸引点</span><textarea name="attract3s" rows="2"></textarea></label>
+            <label><span>短视频传播判断</span><textarea name="shortVideoFit" rows="2"></textarea></label>
+            <label><span>核心循环</span><textarea name="loop" rows="4" placeholder="每行一个步骤" required></textarea></label>
+            <label><span>前 30 秒</span><textarea name="first30" rows="3"></textarea></label>
+            <label><span>前 3 分钟</span><textarea name="first3" rows="3"></textarea></label>
+            <label><span>10 分钟后理由</span><textarea name="tenMinutes" rows="2"></textarea></label>
+            <label><span>次日回流理由</span><textarea name="returnReason" rows="2"></textarea></label>
+            <label><span>系统结构</span><textarea name="systems" rows="2"></textarea></label>
+            <label><span>UI 页面结构</span><textarea name="uiPages" rows="2"></textarea></label>
+            <label><span>数值结构</span><textarea name="numbers" rows="2"></textarea></label>
+            <label><span>变现结构</span><textarea name="monetization" rows="2"></textarea></label>
+            <label><span>可复用模块</span><textarea name="modules" rows="3" placeholder="每行一个模块"></textarea></label>
+            <label><span>单人开发判断</span><textarea name="soloJudgement" rows="2"></textarea></label>
+            <label><span>风险</span><textarea name="risks" rows="3" placeholder="每行一个风险"></textarea></label>
+            <label><span>不建议模仿</span><textarea name="avoid" rows="3" placeholder="每行一条"></textarea></label>
+            <label><span>最终结论</span><textarea name="conclusion" rows="2"></textarea></label>
+            <button class="primary-btn" type="submit">保存拆解</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="modules" class="content-band">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Reusable Modules</p>
+            <h2>模块灵感库</h2>
+          </div>
+          <div class="toolbar">
+            <select data-module-filter aria-label="模块类型筛选"></select>
+          </div>
+        </div>
+
+        <div class="two-column">
+          <form class="form-panel" data-module-form>
+            <h3>新增模块</h3>
+            <label><span>模块名称</span><input name="name" required placeholder="例如：结算页双倍奖励" /></label>
+            <label><span>模块类型</span><select name="type" required></select></label>
+            <label><span>适用玩法</span><input name="fits" placeholder="合成、放置、经营" /></label>
+            <label><span>开发成本</span><select name="cost"><option>低</option><option>中</option><option>高</option></select></label>
+            <label><span>模块说明</span><textarea name="description" rows="3" required></textarea></label>
+            <label><span>风险</span><textarea name="risk" rows="3"></textarea></label>
+            <button class="primary-btn" type="submit">加入模块库</button>
+          </form>
+          <div class="module-board" data-module-board></div>
+        </div>
+        <div class="module-graph" data-module-graph></div>
+      </section>
+
+      <section id="composer" class="content-band">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">MVP Composer</p>
+            <h2>小游戏 MVP 组合器</h2>
+          </div>
+          <div class="toolbar">
+            <button class="ghost-btn" type="button" data-action="copy-prototype">复制当前方案</button>
+            <button class="ghost-btn" type="button" data-action="download-prototype">下载 Markdown</button>
+          </div>
+        </div>
+
+        <div class="composer-layout">
+          <form class="composer-panel" data-composer-form>
+            <label><span>题材关键词</span><input name="theme" value="猫咪" required /></label>
+            <label><span>核心玩法</span><select name="genre"></select></label>
+            <label><span>目标平台</span><select name="platform"></select></label>
+            <label><span>开发周期</span><select name="cycle"><option>7 天 Demo</option><option>30 天 MVP</option></select></label>
+            <label><span>引用模块</span><select name="moduleIds" multiple size="6"></select></label>
+            <button class="primary-btn" type="submit">生成并保存方案</button>
+          </form>
+          <article class="proposal-panel" data-proposal-panel></article>
+          <aside class="prototype-list" data-prototype-list></aside>
+        </div>
+      </section>
+
+      <section id="templates" class="content-band">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Templates</p>
+            <h2>研究模板</h2>
+          </div>
+          <span class="status-pill">可复制到 Markdown、飞书、Notion 或 Obsidian</span>
+        </div>
+        <div class="template-grid" data-template-grid></div>
+      </section>
+    </main>
+
+    <div class="toast" data-toast role="status" aria-live="polite"></div>
+    <dialog class="detail-dialog" data-game-dialog>
+      <div class="dialog-head">
+        <strong>游戏详情</strong>
+        <button class="ghost-btn" type="button" data-action="close-game-dialog">关闭</button>
+      </div>
+      <div class="dialog-body" data-game-dialog-body></div>
+    </dialog>
+
+    <script src="./data/static-data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
